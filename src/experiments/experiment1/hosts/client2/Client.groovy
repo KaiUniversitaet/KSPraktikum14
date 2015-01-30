@@ -35,6 +35,12 @@ class Client {
     /** Zielportadresse */
     int serverPort
 
+    /** Nameserver-IP-Adresse */
+    String nameServerIpAddr
+
+    /** Nameserverportadresse */
+    int nameServerPort
+
     // HTTP-Header fuer GET-Request
     String request =
             """\
@@ -119,6 +125,19 @@ Host: www.sesam-strasse.com
         // ------------------------------------------------------------
 
         Utils.writeLog("Client", "client", "startet", 1)
+
+        // ------------------------------------------------------------
+
+        // IP-Adresse und Portnummer des Nameserver
+        nameServerIpAddr = config.nameServerIpAddr
+        nameServerPort = config.nameServerPort
+
+        stack.udpSend(dstIpAddr: nameServerIpAddr, dstPort: nameServerPort, srcPort: ownPort, sdu: serverIpAddr)
+        Utils.writeLog("Client", "client", "sendet: $serverIpAddr", 1)
+
+        String d1, d2
+        (d1, d2, serverIpAddr) = stack.udpReceive()
+        Utils.writeLog("Client", "client", "empfängt: $serverIpAddr", 1)
 
         // ------------------------------------------------------------
 
