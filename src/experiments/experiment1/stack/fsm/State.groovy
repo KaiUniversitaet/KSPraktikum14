@@ -37,4 +37,10 @@ class State {
     /** Daten werden gesendet */
     static final int S_SEND_DATA = 250
 
+    /** SYN+ACK wird gesendet */
+    static final int S_SEND_SYN_ACK = 255
+
+    /** Auf SYN+ACK+ACK wartend */
+    static final int S_WAIT_SYN_ACK_ACK = 260
+
 }
