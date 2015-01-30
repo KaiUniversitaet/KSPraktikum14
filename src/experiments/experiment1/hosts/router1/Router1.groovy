@@ -117,7 +117,6 @@ class Router1 {
                     }
                 }
             }
-            Utils.writeLog("Router1", "rfn", "$copyrt", 1)
             stack.setRoutingTable(copyrt)
         }
     }
