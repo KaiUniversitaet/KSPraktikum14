@@ -142,7 +142,8 @@ class TcpLayer {
             [on: Event.E_SYN_ACK_ACK_SENT, from: State.S_SEND_SYN_ACK_ACK, to: State.S_READY],
 
             // Passiver Verbindungsaufbau
-            [on: Event.E_RCVD_SYN, from: State.S_IDLE, to: State.S_SEND_SYN_ACK],
+            [on: Event.E_CONN_REQ, from: State.S_IDLE, to: State.S_WAIT_SYN],
+            [on: Event.E_RCVD_SYN, from: State.S_WAIT_SYN, to: State.S_SEND_SYN_ACK],
             [on: Event.E_SEND_SYN_ACK, from: State.S_SEND_SYN_ACK, to: State.S_WAIT_SYN_ACK_ACK],
             [on: Event.E_RCVD_SYN_ACK_ACK, from: State.S_WAIT_SYN_ACK_ACK, to: State.S_READY],
 
