@@ -16,9 +16,6 @@ class Event {
     /** Daten senden */
     static final int E_SEND_DATA = 150
 
-    /** SYN wurde empfangen */
-    static final int E_RCVD_SYN = 155
-
     /** SYN+ACK wurde empfangen */
     static final int E_RCVD_SYN_ACK = 160
 
@@ -45,11 +42,5 @@ class Event {
 
     /** FIN empfangen */
     static final int E_RCVD_FIN = 280
-
-    /** FIN empfangen */
-    static final int E_SEND_SYN_ACK = 285
-
-    /** FIN empfangen */
-    static final int E_RCVD_SYN_ACK_ACK = 290
 
 }
