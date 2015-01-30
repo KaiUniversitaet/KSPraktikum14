@@ -98,26 +98,28 @@ class Router2 {
         /** Empfangene Routinginformationen */
         String rInfo
 
-        // Auf UDP-Empfang warten
-        (iPAddr, port, rInfo) = stack.udpReceive()
-        List iInfo = rInfo.tokenize()
+        while (run) {
+            // Auf UDP-Empfang warten
+            (iPAddr, port, rInfo) = stack.udpReceive()
+            List iInfo = rInfo.tokenize()
 
-        // Jetzt aktuelle Routingtablle holen:
-        List<List> rt = stack.getRoutingTable()
-        List<List> copyrt = rt.clone() as List<List>
-        for (entry in rt){
-            for (info in iInfo) {
-                if (entry[0] == info){
-                    if (entry[2]!=iPAddr){
-                        List temp = entry
-                        copyrt.remove(entry)
-                        copyrt.push(temp)
+            // Jetzt aktuelle Routingtablle holen:
+            List<List> rt = stack.getRoutingTable()
+            List<List> copyrt = rt.clone() as List<List>
+            for (entry in rt) {
+                for (info in iInfo) {
+                    if (entry[0] == info) {
+                        if (entry[2] == iPAddr) {
+                            List temp = entry
+                            copyrt.remove(entry)
+                            copyrt.add(0, temp)
+                        }
                     }
                 }
             }
+            Utils.writeLog("Router1", "rfn", "$copyrt", 1)
+            stack.setRoutingTable(copyrt)
         }
-        Utils.writeLog("Router1", "rfn", "$copyrt", 1)
-        stack.setRoutingTable(copyrt)
     }
 
     // ------------------------------------------------------------
