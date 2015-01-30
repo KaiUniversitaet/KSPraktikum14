@@ -43,4 +43,19 @@ class Event {
     /** FIN empfangen */
     static final int E_RCVD_FIN = 280
 
+    /** SYN empfangen */
+    static final int E_RCVD_SYN = 285
+
+    /** SYN+ACK senden */
+    static final int E_SEND_SYN_ACK = 290
+
+    /** SYN+ACK+ACK empfangen */
+    static final int E_RCVD_SYN_ACK_ACK = 295
+
+    /** FIN+ACK wurde gesendet */
+    static final int E_FIN_ACK_SENT = 300
+
+    /** FIN+ACK+ACK empfangen */
+    static final int E_RCVD_FIN_ACK_ACK = 305
+
 }
