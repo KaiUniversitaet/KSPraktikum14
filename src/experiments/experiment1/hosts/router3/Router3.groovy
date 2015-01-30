@@ -77,8 +77,8 @@ class Router3 {
 
         while (run) {
             // Periodisches Versenden von Routinginformationen
-            sendPeriodical()
             sleep(config.periodRInfo)
+            sendPeriodical()
         }
     }
 
@@ -104,7 +104,7 @@ class Router3 {
 
         // Jetzt aktuelle Routingtablle holen:
         List<List> rt = stack.getRoutingTable()
-        List<List> copyrt = rt.clone()
+        List<List> copyrt = rt.clone() as List<List>
         for (entry in rt){
             for (info in iInfo) {
                 if (entry[0] == info){

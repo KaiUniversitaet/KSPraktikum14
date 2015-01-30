@@ -77,8 +77,8 @@ class Router1 {
 
         while (run) {
             // Periodisches Versenden von Routinginformationen
-            sendPeriodical()
             sleep(config.periodRInfo)
+            sendPeriodical()
         }
     }
 
@@ -101,11 +101,10 @@ class Router1 {
         // Auf UDP-Empfang warten
         (iPAddr, port, rInfo) = stack.udpReceive()
         List iInfo = rInfo.tokenize()
-        Utils.writeLog("Router1", "asacyycy", "jhscahkcshakca", 1)
 
         // Jetzt aktuelle Routingtablle holen:
         List<List> rt = stack.getRoutingTable()
-        List<List> copyrt = rt.clone()
+        List<List> copyrt = rt.clone() as List<List>
         for (entry in rt){
             for (info in iInfo) {
                 if (entry[0] == info){
