@@ -164,7 +164,7 @@ environments {
                  lpName: "lp2",
                  link: experiments.experiment1.links.P2PLink1.id,
                  connector: experiments.experiment1.links.P2PLink1.CONNECTOR_1,
-                 macAddr: "00:00:00:00:00:11",
+                 macAddr: "00:00:00:00:00:12",
                  ipAddr: "192.168.1.1"
                 ],
 
@@ -172,7 +172,7 @@ environments {
                  lpName: "lp3",
                  link: experiments.experiment1.links.P2PLink2.id,
                  connector: experiments.experiment1.links.P2PLink2.CONNECTOR_1,
-                 macAddr: "00:00:00:00:00:11",
+                 macAddr: "00:00:00:00:00:13",
                  ipAddr: "192.168.2.1"
                 ],
 
@@ -202,7 +202,7 @@ environments {
                  lpName: "lp2",
                  link: experiments.experiment1.links.P2PLink1.id,
                  connector: experiments.experiment1.links.P2PLink1.CONNECTOR_2,
-                 macAddr: "00:00:00:00:00:12",
+                 macAddr: "00:00:00:00:00:14",
                  ipAddr: "192.168.1.2"
                 ],
 
@@ -210,7 +210,7 @@ environments {
                  lpName: "lp4",
                  link: experiments.experiment1.links.P2PLink3.id,
                  connector: experiments.experiment1.links.P2PLink3.CONNECTOR_1,
-                 macAddr: "00:00:00:00:00:12",
+                 macAddr: "00:00:00:00:00:15",
                  ipAddr: "192.168.3.1"
                 ],
 
@@ -238,7 +238,7 @@ environments {
                  lpName: "lp3",
                  link: experiments.experiment1.links.P2PLink2.id,
                  connector: experiments.experiment1.links.P2PLink2.CONNECTOR_2,
-                 macAddr: "00:00:00:00:00:13",
+                 macAddr: "00:00:00:00:00:16",
                  ipAddr: "192.168.2.2"
                 ],
 
@@ -246,7 +246,7 @@ environments {
                  lpName: "lp5",
                  link: experiments.experiment1.links.P2PLink4.id,
                  connector: experiments.experiment1.links.P2PLink4.CONNECTOR_1,
-                 macAddr: "00:00:00:00:00:13",
+                 macAddr: "00:00:00:00:00:17",
                  ipAddr: "192.168.4.1"
                 ],
 
@@ -274,7 +274,7 @@ environments {
                  lpName: "lp4",
                  link: experiments.experiment1.links.P2PLink3.id,
                  connector: experiments.experiment1.links.P2PLink3.CONNECTOR_2,
-                 macAddr: "00:00:00:00:00:14",
+                 macAddr: "00:00:00:00:00:18",
                  ipAddr: "192.168.3.2"
                 ],
 
@@ -282,7 +282,7 @@ environments {
                  lpName: "lp5",
                  link: experiments.experiment1.links.P2PLink4.id,
                  connector: experiments.experiment1.links.P2PLink4.CONNECTOR_2,
-                 macAddr: "00:00:00:00:00:14",
+                 macAddr: "00:00:00:00:00:19",
                  ipAddr: "192.168.4.2"
                 ],
 
@@ -290,7 +290,7 @@ environments {
                  lpName: "lp6",
                  link: experiments.experiment1.links.Hub2.id,
                  connector: experiments.experiment1.links.Hub2.HUB_PORT_2,
-                 macAddr: "00:00:00:00:00:14",
+                 macAddr: "00:00:00:00:00:20",
                  ipAddr: "192.168.5.1"
                 ],
 
