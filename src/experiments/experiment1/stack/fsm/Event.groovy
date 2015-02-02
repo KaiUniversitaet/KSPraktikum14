@@ -58,4 +58,13 @@ class Event {
     /** FIN+ACK+ACK empfangen */
     static final int E_RCVD_FIN_ACK_ACK = 305
 
+
+    /** Verbindung eröffnet */
+    static final int E_CONN_ESTABL = 310
+
+    /** Verbindung geschlossen */
+    static final int E_CONN_CLS = 315
+
+    /** Passive Verbindungsaufnahme     */
+    static final int E_LISTEN = 320
 }

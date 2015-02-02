@@ -142,10 +142,11 @@ class TcpLayer {
             [on: Event.E_SYN_ACK_ACK_SENT, from: State.S_SEND_SYN_ACK_ACK, to: State.S_READY],
 
             // Passiver Verbindungsaufbau
-            [on: Event.E_CONN_REQ, from: State.S_IDLE, to: State.S_WAIT_SYN],
-            [on: Event.E_RCVD_SYN, from: State.S_WAIT_SYN, to: State.S_SEND_SYN_ACK],
+            //[on: Event.E_LISTEN, from: State.S_IDLE, to: State.S_WAIT_SYN],
+            [on: Event.E_RCVD_SYN, from: State.S_IDLE, to: State.S_SEND_SYN_ACK],
             [on: Event.E_SEND_SYN_ACK, from: State.S_SEND_SYN_ACK, to: State.S_WAIT_SYN_ACK_ACK],
-            [on: Event.E_RCVD_SYN_ACK_ACK, from: State.S_WAIT_SYN_ACK_ACK, to: State.S_READY],
+            [on: Event.E_RCVD_SYN_ACK_ACK, from: State.S_WAIT_SYN_ACK_ACK, to: State.S_CONN_ESTABL],
+            [on: Event.E_CONN_ESTABL, from: State.S_CONN_ESTABL, to: State.S_READY],
 
             // Datenübertragung: Senden
             [on: Event.E_SEND_DATA, from: State.S_READY, to: State.S_SEND_DATA],
@@ -166,7 +167,8 @@ class TcpLayer {
             // Passiver Verbindungsabbau
             [on: Event.E_RCVD_FIN, from: State.S_READY, to: State.S_SEND_FIN_ACK],
             [on: Event.E_FIN_ACK_SENT, from: State.S_SEND_FIN_ACK, to: State.S_WAIT_FIN_ACK_ACK],
-            [on: Event.E_RCVD_FIN_ACK_ACK, from: State.S_WAIT_FIN_ACK_ACK, to: State.S_IDLE]
+            [on: Event.E_RCVD_FIN_ACK_ACK, from: State.S_WAIT_FIN_ACK_ACK, to: State.S_CONN_CLS],
+            [on: Event.E_CONN_CLS, from: State.S_CONN_CLS, to: State.S_IDLE]
         ]
 
     /** Die Finite Zustandsmaschine. */
@@ -248,9 +250,13 @@ class TcpLayer {
             // Ereignis bestimmen
             switch(true) {
                 case (recvFinFlag):                          event = Event.E_RCVD_FIN      ;break
+                case (recvSynFlag):                          event = Event.E_RCVD_SYN
                 case (recvSynFlag && recvAckFlag):           event = Event.E_RCVD_SYN_ACK  ;break
-                case (recvAckFlag && t_pdu.sdu.size() == 0): event = Event.E_RCVD_ACK      ;break
+                case (recvAckFlag && t_pdu.sdu.size() == 0): event = Event.E_RCVD_ACK
+                case (recvAckFlag && (recvAckNum == sendAckNum+1)):
+                                                             event = Event.E_RCVD_SYN_ACK_ACK;break
                 case (recvAckFlag && t_pdu.sdu.size() > 0):  event = Event.E_RCVD_DATA     ;break
+
             }
 
             if (event) {
@@ -363,7 +369,34 @@ class TcpLayer {
 
             // ----------------------------------------------------------
             // Passiver Verbindungsaufbau
-            // ...
+                case (State.S_SEND_SYN_ACK):
+                    //
+                    sendSynFlag = true
+                    sendAckFlag = true
+                    sendAckNum = recvSeqNum + 1
+                    sendSeqNum = new Random().nextInt(6000) + 1
+                    sendFinFlag = false
+                    sendRstFlag = false
+                    sendData = ""
+
+                    // T-PDU erzeugen und senden
+                    sendTpdu()
+
+                    // Neuen Zustand der FSM erzeugen
+                    fsm.fire(Event.E_SEND_SYN_ACK)
+
+                    break
+
+                case (State.S_CONN_ESTABL):
+
+                    // Neuen Zustand der FSM erzeugen
+                    fsm.fire(Event.E_CONN_ESTABL)
+
+                    //Informieren über vollendeten Verbindungsaufbau
+                    notifyOpen()
+
+                    break
+
 
             // ----------------------------------------------------------
             // Aktiver Verbindungsabbau
@@ -404,7 +437,28 @@ class TcpLayer {
 
             // ----------------------------------------------------------
             // Passiver Verbindungsabbau
-            // ...
+
+                case (State.S_SEND_FIN_ACK):
+                    // FIN empfangen, ACK senden
+                    sendAckFlag = true
+                    sendFinFlag = true
+                    sendSeqNum = recvAckNum
+                    sendAckNum = recvSeqNum + 1
+                    sendData = ""
+
+                    // FIN+ACK senden
+                    sendTpdu()
+
+                    // Neuen Zustand erzeugen
+                    fsm.fire(Event.E_FIN_ACK_SENT)
+
+                    break
+
+                case (State.S_CONN_CLS):
+                    // FIN+ACK+ACK empfangen, Ende der Verbindung signalisieren
+                    fsm.fire(Event.E_CONN_CLS)
+                    notifyClose()
+                    break
 
             // ----------------------------------------------------------
             // Daten empfangen
