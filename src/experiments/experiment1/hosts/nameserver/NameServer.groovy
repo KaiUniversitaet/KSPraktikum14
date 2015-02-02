@@ -22,7 +22,7 @@ class NameServer {
 
     /** Tabelle zur Umsetzung von Namen in IP-Adressen */
     Map<String, String> nameTable = [
-            "meinhttpserver": "192.168.5.2",
+            "meinhttpserver": "192.168.2.10",
             "alice": "0.0.0.0",
             "bob": "0.0.0.0",
     ]

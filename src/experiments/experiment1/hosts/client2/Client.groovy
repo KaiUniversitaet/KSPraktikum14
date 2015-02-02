@@ -115,7 +115,7 @@ Host: www.sesam-strasse.com
         // ------------------------------------------------------------
 
         // IPv4-Adresse und Portnummer des HTTP-Dienstes
-        serverIpAddr = config.serverIpAddr
+        serverIpAddr = config.serverName
         serverPort = config.serverPort
 
         // Netzwerkstack initialisieren
@@ -127,6 +127,8 @@ Host: www.sesam-strasse.com
         Utils.writeLog("Client", "client", "startet", 1)
 
         // ------------------------------------------------------------
+        // Warten, bis ARP-Replies angekommen sind
+        sleep(5000)
 
         // IP-Adresse und Portnummer des Nameserver
         nameServerIpAddr = config.nameServerIpAddr

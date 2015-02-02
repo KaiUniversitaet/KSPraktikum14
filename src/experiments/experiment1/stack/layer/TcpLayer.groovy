@@ -250,11 +250,14 @@ class TcpLayer {
             // Ereignis bestimmen
             switch(true) {
                 case (recvFinFlag):                          event = Event.E_RCVD_FIN      ;break
-                case (recvSynFlag):                          event = Event.E_RCVD_SYN
-                case (recvSynFlag && recvAckFlag):           event = Event.E_RCVD_SYN_ACK  ;break
-                case (recvAckFlag && t_pdu.sdu.size() == 0): event = Event.E_RCVD_ACK
-                case (recvAckFlag && (recvAckNum == sendAckNum+1)):
-                                                             event = Event.E_RCVD_SYN_ACK_ACK;break
+                case (recvSynFlag):
+                    if (recvAckFlag)        event = Event.E_RCVD_SYN_ACK
+                    else                    event = Event.E_RCVD_SYN
+                    break
+                case (recvAckFlag && t_pdu.sdu.size() == 0):
+                    if (recvAckNum == sendAckNum+1) event = Event.E_RCVD_ACK
+                    else                            event = Event.E_RCVD_SYN_ACK_ACK
+                    break
                 case (recvAckFlag && t_pdu.sdu.size() > 0):  event = Event.E_RCVD_DATA     ;break
 
             }
@@ -323,6 +326,7 @@ class TcpLayer {
             // Neuen Zustand behandeln
 
             newState = nextState
+            Utils.writeLog("TcpLayer","receive"," wechselt in den ZUSTAND:  ${newState}",2)
             switch (newState) {
 
             // ----------------------------------------------------------
