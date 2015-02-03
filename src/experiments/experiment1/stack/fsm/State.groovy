@@ -31,7 +31,7 @@ class State {
     /** SYN zur Verbindungseröffnung wird gesendet */
     static final int S_SEND_SYN = 230
 
-    /** SYN zur Verbindungsbeendigung wird gesendet */
+    /** FIN zur Verbindungsbeendigung wird gesendet */
     static final int S_SEND_FIN = 240
 
     /** Daten werden gesendet */

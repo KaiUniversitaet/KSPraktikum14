@@ -387,8 +387,8 @@ class TcpLayer {
                     sendTpdu()
 
                     // Neuen Zustand der FSM erzeugen
-                    fsm.fire(Event.E_SEND_SYN_ACK)
-
+                    int nextState2 = fsm.fire(Event.E_SEND_SYN_ACK)
+                    Utils.writeLog("TcpLayer","receive", " wechselt in ZUSTAND: ${nextState2}",2)
                     break
 
                 case (State.S_CONN_ESTABL):
