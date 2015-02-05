@@ -50,12 +50,11 @@ public class Stack {
      * Der Schlüssel (Name) wird in der Routingtabelle hinterlegt und von der Link-Schicht beim Senden zur
      * Auswahl des Adapters verwendet
      */
-    Map<String,Connector> connectors = [:]
+    Map<String, Connector> connectors = [:]
 
     //========================================================================================================
     // NETZWERKADAPTER ENDE
     //========================================================================================================
-
 
     //========================================================================================================
     // Vereinbarungen ANFANG
@@ -117,8 +116,7 @@ public class Stack {
 
                 // Anschluss in einen virtuellen HUB (virtuelles LAN)
                 connectors[con.lpName] = new ConnectorToVirtual(con.lpName, con.link, con.connector, con.macAddr, conQ)
-            }
-            else {
+            } else {
                 // Anschluss in ein reales LAN
                 connectors[con.lpName] = new ConnectorToEthernet(con.lpName, con.deviceName, con.macAddr, con.recvFilter, conQ)
             }
@@ -162,7 +160,7 @@ public class Stack {
         link.stop()
 
         // Netzwerkanschluesse stoppen
-        connectors.values().each {it.stop()}
+        connectors.values().each { it.stop() }
     }
     //----------------------------------------------------------
 
@@ -196,22 +194,26 @@ public class Stack {
      * Schnittstelle von TCP-Schicht
      * @param Map idu: keys: connId  (hier nicht verwendet)
      * @return tidu keys: connId, sdu; sdu ist "null",
-            falls innerhalb der angegebenen Zeit kein Element aus der Warteschlange entnommen wurde
+     falls innerhalb der angegebenen Zeit kein Element aus der Warteschlange entnommen wurde
      */
     Map tcpReceive(Map idu) {
         Map tidu = [:]
 
-        // Blockierendes Empfangen von TCP,
-        TA_IDU ta_idu = fromTcpQ.poll(Utils.sec10, TimeUnit.MILLISECONDS)
-        // Timeout aufgetreten?
-        if (ta_idu) {
-            // Nein
-            tidu = [connId: ta_idu.connId, sdu: ta_idu.sdu]
-        }
-        else {
-            // Ja
-            Utils.writeLog("Stack", "tcpReceive", "Stooooooooooop", 1)
-            tidu = [connId: idu.connId, sdu: null]
+        while (true) {
+            // Blockierendes Empfangen von TCP,
+            TA_IDU ta_idu = fromTcpQ.poll(Utils.sec2, TimeUnit.MILLISECONDS)
+            // Timeout aufgetreten?
+            if (ta_idu) {
+                // Nein
+                tidu = [connId: ta_idu.connId, sdu: ta_idu.sdu]
+                break
+            } else if (tcp.dataSent) {
+                // Ja
+                Utils.writeLog("Stack", "tcpreiceve", "${tcp.fsm.currentState}", 1)
+                Utils.writeLog("Stack", "tcpReceive", "Stooooooooooop", 1)
+                tidu = [connId: idu.connId, sdu: null]
+                break
+            }
         }
         return tidu
     }

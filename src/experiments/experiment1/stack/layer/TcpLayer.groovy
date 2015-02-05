@@ -42,6 +42,8 @@ class TcpLayer {
     /** Maximale TCP-Segmentgrösse */
     static final int MSS = 100
 
+    public boolean dataSent = false
+
     //------------------------------------------------------------------------------
 
     //------------------------------------------------------------------------------
@@ -306,6 +308,7 @@ class TcpLayer {
                         sendData = new String(pakete[i])
                         handleStateChange(Event.E_SEND_DATA)
                     }
+                    dataSent = true
                     break
             }
         }
@@ -494,7 +497,6 @@ class TcpLayer {
                     // Senden von Anwendungsdaten
                     sendSynFlag = false
                     sendAckFlag = true
-                        sleep(2000)
                     sendFinFlag = false
 
                     // Daten senden

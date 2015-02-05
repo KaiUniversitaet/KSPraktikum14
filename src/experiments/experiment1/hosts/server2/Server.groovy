@@ -44,14 +44,14 @@ class Server {
     GString reply1 =
             """\
 HTTP/1.1 200 OK
-Content-Length: ${->dataLength}
+Content-Length: ${-> dataLength}
 Content-Type: text/plain
 
 """
 
     GString reply2 =
             """\
-Das Objekt ${->name} wurde angefragt!
+Das Objekt ${-> name} wurde angefragt!
 """
 
     /** Ein Matcher-Objekt zur Verwendung regulärer Ausdruecke */
@@ -59,7 +59,6 @@ Das Objekt ${->name} wurde angefragt!
 
     /** Daten empfangen solange false */
     boolean ready = false
-
 
     //========================================================================================================
     // Methoden ANFANG
@@ -99,7 +98,6 @@ Das Objekt ${->name} wurde angefragt!
 
         Utils.writeLog("Server", "server", "startet", 1)
 
-
         //------------------------------------------------
 
         while (run) {
@@ -116,9 +114,11 @@ Das Objekt ${->name} wurde angefragt!
 
                 // Es wurden längere Zeit keine Daten empfangen oder die Datenlänge ist 0
                 // -> die TCP-Verbindung wird als geschlossen angenommen
-                if (!tidu.sdu)
-                // Nein, innere while-Schleife abbrechen
+                if (!tidu.sdu) {
+                    // Nein, innere while-Schleife abbrechen
+                    stack.tcpClose(connId: connId)
                     break
+                }
 
                 // A-PDU uebernehmen
                 apdu = tidu.sdu
@@ -150,7 +150,7 @@ Das Objekt ${->name} wurde angefragt!
 
                         case "daten":
                             // hier langen HTTP-body erzeugen um lang anhaltende Übertragung zu erreichen
-                            data = new String(Utils.generate(650))
+                            data = new String(Utils.generate(50000))
 
                             dataLength = data.size()
                             reply = reply1 + data // dabei wird dataLength in reply1 eingetragen

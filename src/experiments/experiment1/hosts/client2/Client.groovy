@@ -162,7 +162,7 @@ Host: www.sesam-strasse.com
 
             // Empfang
             while (curBodyLength < bodyLength) {
-                Utils.writeLog("Client", "receive", "${curBodyLength + " " + bodyLength}", 1)
+                Utils.writeLog("Client", "receive", "${curBodyLength + " " + bodyLength}", 11)
                 // Auf Empfang warten
                 Map tidu = stack.tcpReceive(connId: connId)
 
