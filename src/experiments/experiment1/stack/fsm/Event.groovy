@@ -49,22 +49,6 @@ class Event {
     /** SYN+ACK senden */
     static final int E_SEND_SYN_ACK = 290
 
-    /** SYN+ACK+ACK empfangen */
-    static final int E_RCVD_SYN_ACK_ACK = 295
-
     /** FIN+ACK wurde gesendet */
-    static final int E_FIN_ACK_SENT = 300
-
-    /** FIN+ACK+ACK empfangen */
-    static final int E_RCVD_FIN_ACK_ACK = 305
-
-
-    /** Verbindung eröffnet */
-    static final int E_CONN_ESTABL = 310
-
-    /** Verbindung geschlossen */
-    static final int E_CONN_CLS = 315
-
-    /** Passive Verbindungsaufnahme     */
-    static final int E_LISTEN = 320
+    static final int E_SEND_FIN_ACK = 300
 }

@@ -94,10 +94,6 @@ class LinkLayer {
             // blockierendes Lesen der Anschluesse
             cl_idu = fromConnQ.take()
 
-            //kleine Pause
-            sleep(3000)
-
-
             // Mac-Frame (L-PDU) entnehmen
             L_PDU macFrame = cl_idu.sdu as L_PDU
 
@@ -176,8 +172,6 @@ class LinkLayer {
                                     lc_idu = new LC_IDU()
                                     lc_idu.sdu = macFrame
 
-                                    //kleine Pause
-                                    sleep(1000)
                                     connector.send(lc_idu)
                                 }
                                 break
@@ -258,10 +252,6 @@ class LinkLayer {
 
                     Utils.writeLog("LinkLayer", "send", "sendet ARP-Request: ${lc_idu}", 5)
 
-
-                //kleine Pause
-                sleep(1000)
-
                     // MAC_Frame mit ARP-PDU an Anschluss uebergeben
                     connector.send(lc_idu)
 
@@ -289,10 +279,6 @@ class LinkLayer {
             macFrame.type = ETHERTYPE_IP // Typfeld
 
             Utils.writeLog("LinkLayer", "send", "uebergibt  an Anschluss ${lpName}: ${lc_idu}", 5)
-
-
-            //kleine Pause
-            sleep(1000)
 
             // Daten an Anschluss uebergeben
             connector.send(lc_idu)

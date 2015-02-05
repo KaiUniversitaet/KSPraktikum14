@@ -69,7 +69,7 @@ class Router2 {
         neighborTable = config.neighborTable
 
         // Thread zum Empfang von Routinginformationen erzeugen
-        Thread.start{receiveFromNeigbor()}
+        //Thread.start{receiveFromNeigbor()}
 
         // ------------------------------------------------------------
 
@@ -78,7 +78,7 @@ class Router2 {
         while (run) {
             // Periodisches Versenden von Routinginformationen
             sleep(config.periodRInfo)
-            sendPeriodical()
+            //sendPeriodical()
         }
     }
 

@@ -210,6 +210,7 @@ public class Stack {
         }
         else {
             // Ja
+            Utils.writeLog("Stack", "tcpReceive", "Stooooooooooop", 1)
             tidu = [connId: idu.connId, sdu: null]
         }
         return tidu

@@ -49,13 +49,4 @@ class State {
     /** Auf FIN+ACK+ACK wartend */
     static final int S_WAIT_FIN_ACK_ACK= 310
 
-    /** Auf SYN wartend */
-    static final int S_WAIT_SYN = 320
-
-    /** SYN-ACK-ACK wurde empfangen */
-    static final int S_CONN_ESTABL  =330
-
-    /** FIN-ACK-ACK wurde empfangen */
-    static final int S_CONN_CLS = 340
-
 }

@@ -118,6 +118,9 @@ Host: www.sesam-strasse.com
         serverIpAddr = config.serverName
         serverPort = config.serverPort
 
+        // Eigener UDP-Port
+        ownPort = config.ownPort
+
         // Netzwerkstack initialisieren
         stack = new Stack()
         stack.start(config)
@@ -127,8 +130,6 @@ Host: www.sesam-strasse.com
         Utils.writeLog("Client", "client", "startet", 1)
 
         // ------------------------------------------------------------
-        // Warten, bis ARP-Replies angekommen sind
-        sleep(5000)
 
         // IP-Adresse und Portnummer des Nameserver
         nameServerIpAddr = config.nameServerIpAddr
@@ -161,6 +162,7 @@ Host: www.sesam-strasse.com
 
             // Empfang
             while (curBodyLength < bodyLength) {
+                Utils.writeLog("Client", "receive", "${curBodyLength + " " + bodyLength}", 1)
                 // Auf Empfang warten
                 Map tidu = stack.tcpReceive(connId: connId)
 
@@ -205,6 +207,7 @@ Host: www.sesam-strasse.com
                 // Länge des HTTP-Body's holen
                 bodyLength = (matcher[0] as List<String>)[1].toInteger()
                 state = WAIT_DNL
+                Utils.writeLog("Client", "handleData", "$bodyLength", 1)
             }
         }
 
