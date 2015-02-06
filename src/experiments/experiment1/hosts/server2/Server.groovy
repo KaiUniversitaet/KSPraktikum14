@@ -116,7 +116,6 @@ Das Objekt ${-> name} wurde angefragt!
                 // -> die TCP-Verbindung wird als geschlossen angenommen
                 if (!tidu.sdu) {
                     // Nein, innere while-Schleife abbrechen
-                    stack.tcpClose(connId: connId)
                     break
                 }
 
@@ -150,17 +149,23 @@ Das Objekt ${-> name} wurde angefragt!
 
                         case "daten":
                             // hier langen HTTP-body erzeugen um lang anhaltende Übertragung zu erreichen
-                            data = new String(Utils.generate(50000))
+                            data = new String(Utils.generate(2048))
 
                             dataLength = data.size()
                             reply = reply1 + data // dabei wird dataLength in reply1 eingetragen
                             break
                     }
 
-                    Utils.writeLog("Server", "server", "sendet: ${new String(apdu)}", 11)
+                    List pakete = Utils.fragment(reply as byte[], 120)
+                    for (int i = 0; i < pakete.size(); i++) {
+                        String replyTemp = new String(pakete[i])
+                        Utils.writeLog("Server", "server", "sendet: ${new String(apdu)}", 11)
 
-                    // Antwort senden
-                    stack.tcpSend([connId: connId, sdu: reply])
+                        // Antwort senden
+                        stack.tcpSend([connId: connId, sdu: replyTemp])
+                        sleep(300)
+                    }
+
                 }
             } // while
         } // while

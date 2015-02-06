@@ -348,7 +348,7 @@ class Utils {
         boolean occurs = false;
         int rnd = 0;
 
-        while(occurs != true)
+        while(!occurs)
         {
             rnd = (int)Math.ceil(Math.random()*bRgh);
 

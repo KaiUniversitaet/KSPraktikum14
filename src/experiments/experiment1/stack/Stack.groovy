@@ -199,22 +199,18 @@ public class Stack {
     Map tcpReceive(Map idu) {
         Map tidu = [:]
 
-        while (true) {
             // Blockierendes Empfangen von TCP,
             TA_IDU ta_idu = fromTcpQ.poll(Utils.sec2, TimeUnit.MILLISECONDS)
             // Timeout aufgetreten?
             if (ta_idu) {
                 // Nein
                 tidu = [connId: ta_idu.connId, sdu: ta_idu.sdu]
-                break
-            } else if (tcp.dataSent) {
+            } else {
                 // Ja
-                Utils.writeLog("Stack", "tcpreiceve", "${tcp.fsm.currentState}", 1)
                 Utils.writeLog("Stack", "tcpReceive", "Stooooooooooop", 1)
                 tidu = [connId: idu.connId, sdu: null]
-                break
             }
-        }
+
         return tidu
     }
     //----------------------------------------------------------
