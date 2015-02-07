@@ -10,7 +10,7 @@ environment = "LOCAL"
 // Debugging:
 // 11: Anwendung, 33: UDP, 44: IP, 55: Link, 66: Anschluesse
 // Beispiel: [1,3,33]: Anwendung normal und UDP normal und debugging
-debugLevel = [1,2]
+debugLevel = [1,2,3,4,5,6]
 
 // Verzögerung in Millisekunden bei der Ausgabe von Utils.writelog (zum Mitlesen auf dem Terminal)
 debugDelay = 0
@@ -391,7 +391,7 @@ environments {
             serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
             document = "index.html"   // Durch HTTP-GET-Request zu ladenden Dokument
             serverPort = 80     // Portnummer des HTTP-Dienstes
-            routerIpAddr = "141.20.33.1" // Adresse des Default Router
+            routerIpAddr = "192.168.2.1" // Adresse des Default Router
             ownPort = 5101
 
 
@@ -401,9 +401,9 @@ environments {
                 virtual: false,
                 lpName: "lp1",
                 // deviceName: Gerätename des Betriebssystems, hier: Mac OS X, Ethernet-Adapter
-                deviceName: "en4",
-                macAddr: "40:6c:8f:11:9e:38",
-                ipAddr: "141.20.33.23",
+                deviceName: "wlp3s0",
+                macAddr: "60:36:dd:36:46:dd",
+                ipAddr: "192.168.2.107",
                 // Dieser Filter fuer Jpcap ist so zu setzen, das nur die erwarteten Frames empfangen werden
                 // Die Filtersyntax entspricht der des Kommandos "tcpdump"
                 recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden

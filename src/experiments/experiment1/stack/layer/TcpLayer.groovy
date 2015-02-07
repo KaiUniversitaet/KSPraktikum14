@@ -242,6 +242,10 @@ class TcpLayer {
                 recvRstFlag = t_pdu.rstFlag
                 recvWindSize = t_pdu.windSize
                 recvData = t_pdu.sdu ? t_pdu.sdu : ""
+
+                // Empfangspuffer bearbeiten
+                window = window - recvData.bytes.size()
+
             } else {
                 null
             }
@@ -345,7 +349,7 @@ class TcpLayer {
                 case (State.S_SEND_SYN):
                     // Verbindungsaufbau beginnen
                     sendAckNum = 0
-                    sendSeqNum = 400 //new Random().nextInt(6000) + 1
+                    sendSeqNum = new Random().nextInt(6000) + 1
 
                     sendAckFlag = false
                     sendSynFlag = true
@@ -390,7 +394,7 @@ class TcpLayer {
                     sendSynFlag = true
                     sendAckFlag = true
                     sendAckNum = recvSeqNum + 1
-                    sendSeqNum = 100 //new Random().nextInt(6000) + 1
+                    sendSeqNum = new Random().nextInt(6000) + 1
                     sendFinFlag = false
                     sendRstFlag = false
                     sendData = ""
@@ -491,7 +495,9 @@ class TcpLayer {
                         // IDU an Anwendung übergeben
                         toAppQ.put(ta_idu)
 
-                        sendWindSize = window +recvData.bytes.size()
+                        // Empfangspuffer bearbeiten
+                        window = window + recvData.bytes.size()
+                        sendWindSize = window
 
                         recvData = ""
 
@@ -514,10 +520,15 @@ class TcpLayer {
                     sendSynFlag = false
                     sendAckFlag = true
                     sendFinFlag = false
-                    window = recvWindSize - sendData.bytes.size()
 
-                    // Daten senden
-                    sendTpdu()
+                    if (sendWindSize >= MSS) {
+                        // Daten senden
+                        sendTpdu()
+                    } else {
+                        sleep(100)
+                        // Daten senden
+                        sendTpdu()
+                    }
 
                     // Bei UTF-8 Encoding besser: sendSeqNum += sendData.bytes.size()
                     sendSeqNum += sendData.bytes.size()
@@ -531,7 +542,7 @@ class TcpLayer {
 
                 case (State.S_RCVD_ACK):
                     // ACK ohne Daten empfangen
-                    window = recvWindSize
+                    sendWindSize = recvWindSize
 
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_READY)
@@ -572,7 +583,7 @@ class TcpLayer {
         ti_idu.protocol = IpLayer.PROTO_TCP
 
         // IDU in Warteschlange fuer Sendewiederholungen eintragen
-        //insertWaitQ(ti_idu)
+        insertWaitQ(ti_idu)
 
         // Daten an IP-Schicht uebergeben
         toIpQ.put(ti_idu)
