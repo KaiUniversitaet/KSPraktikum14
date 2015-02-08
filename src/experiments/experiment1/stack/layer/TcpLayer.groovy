@@ -243,10 +243,7 @@ class TcpLayer {
 
             if (t_pdu.ackFlag) {
                 removeWaitQ(recvAckNum)
-                Utils.writeLog("TCP", "ACKS", "$recvAckNum", 2)
             }
-
-            Utils.writeLog("TCP", "WAIT", "$sendWaitQ", 2)
 
             if (recvSynFlag) {
                 dstIpAddr = it_idu.srcIpAddr
@@ -345,7 +342,7 @@ class TcpLayer {
                 case (State.S_SEND_SYN):
                     // Verbindungsaufbau beginnen
                     sendAckNum = 0
-                    sendSeqNum = 171 //new Random().nextInt(6000) + 1
+                    sendSeqNum = new Random().nextInt(6000) + 1
 
                     sendAckFlag = false
                     sendSynFlag = true
@@ -389,7 +386,7 @@ class TcpLayer {
                     sendSynFlag = true
                     sendAckFlag = true
                     sendAckNum = recvSeqNum + 1
-                    sendSeqNum = 2847 //new Random().nextInt(6000) + 1
+                    sendSeqNum = new Random().nextInt(6000) + 1
                     sendFinFlag = false
                     sendRstFlag = false
                     sendData = ""
@@ -471,7 +468,6 @@ class TcpLayer {
                     // Daten empfangen
                     // Wurde die Sequenznummer erwartet?
                     // ACHTUNG: hier wird momentan Auslieferungsdisziplin der IP-Schicht angenommen!
-                    Utils.writeLog("TCP", "Test", "$recvSeqNum,$sendAckNum", 2)
                     if (recvSeqNum == sendAckNum) {
                         // Ja, ACK senden
                         sendSynFlag = false
