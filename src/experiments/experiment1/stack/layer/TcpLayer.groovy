@@ -230,8 +230,8 @@ class TcpLayer {
 
             // Entfernen von quittierten Daten aus der Warteschlange
             // fuer Sendewiederholungen
-            if (t_pdu.ackFlag)
-                removeWaitQ(recvAckNum) //wenn wir das richtige Ack empfangen haben, dann können wir das entsprechende Paket
+            //if (t_pdu.ackFlag)
+              //  removeWaitQ(recvAckNum) //wenn wir das richtige Ack empfangen haben, dann können wir das entsprechende Paket
             // in jedem Fall aus der Warteschlange nehmen
 
             // Analysieren einer empfangenen TCP-PDU
@@ -583,7 +583,7 @@ class TcpLayer {
         ti_idu.protocol = IpLayer.PROTO_TCP
 
         // IDU in Warteschlange fuer Sendewiederholungen eintragen
-        insertWaitQ(ti_idu)
+        //insertWaitQ(ti_idu)
 
         // Daten an IP-Schicht uebergeben
         toIpQ.put(ti_idu)
