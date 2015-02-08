@@ -42,8 +42,6 @@ class TcpLayer {
     /** Maximale TCP-Segmentgrösse */
     static final int MSS = 100
 
-    public boolean dataSent = false
-
     //------------------------------------------------------------------------------
 
     //------------------------------------------------------------------------------
@@ -105,6 +103,9 @@ class TcpLayer {
     // TCP-Parameter                                                                                        //
     //========================================================================================================
 
+    /** Aktuelle Windowsize */
+    int window
+
     // Sendeparameter
     boolean sendAckFlag
     boolean sendSynFlag
@@ -114,7 +115,6 @@ class TcpLayer {
     int sendAckNum
     int sendWindSize
     String sendData
-    List pakete
 
     // Empfangene Parameter
     int recvSeqNum
@@ -224,24 +224,31 @@ class TcpLayer {
             Utils.writeLog("TcpLayer", "receive", "uebernimmt  von IP: ${it_idu}", 2)
 
             // Hier z.B. noch auf richtigen Zielport testen
-            // ...
+            if (ownPort == t_pdu.dstPort) {
 
-            // Entfernen von quittierten Daten aus der Warteschlange
-            // fuer Sendewiederholungen
-            // if (t_pdu.ackFlag)
-            //     removeWaitQ(recvAckNum)
+                // Entfernen von quittierten Daten aus der Warteschlange
+                // fuer Sendewiederholungen
+                //if (t_pdu.ackFlag)
+                //  removeWaitQ(recvAckNum)
 
-            // Analysieren einer empfangenen TCP-PDU
-            // Bestimmen eines Ereignises, "feuern" der FSM und Behandlung
-            // den neuen Zustands
-            recvSeqNum = t_pdu.seqNum
-            recvAckNum = t_pdu.ackNum
-            recvAckFlag = t_pdu.ackFlag
-            recvFinFlag = t_pdu.finFlag
-            recvSynFlag = t_pdu.synFlag
-            recvRstFlag = t_pdu.rstFlag
-            recvWindSize = t_pdu.windSize
-            recvData = t_pdu.sdu ? t_pdu.sdu : ""
+                // Analysieren einer empfangenen TCP-PDU
+                // Bestimmen eines Ereignises, "feuern" der FSM und Behandlung
+                // den neuen Zustands
+                recvSeqNum = t_pdu.seqNum
+                recvAckNum = t_pdu.ackNum
+                recvAckFlag = t_pdu.ackFlag
+                recvFinFlag = t_pdu.finFlag
+                recvSynFlag = t_pdu.synFlag
+                recvRstFlag = t_pdu.rstFlag
+                recvWindSize = t_pdu.windSize
+                recvData = t_pdu.sdu ? t_pdu.sdu : ""
+
+                // Empfangspuffer bearbeiten
+                window = window - recvData.bytes.size()
+
+            } else {
+                null
+            }
 
             if (recvSynFlag) {
                 dstIpAddr = it_idu.srcIpAddr
@@ -294,21 +301,27 @@ class TcpLayer {
                     dstPort = at_idu.dstPort
 
                     handleStateChange(Event.E_CONN_REQ)
+                    clearWaitQ()
                     break
 
                 case CLOSE:
                     // Verbindung schließen
                     handleStateChange(Event.E_DISCONN_REQ)
+                    clearWaitQ()
                     break
 
                 case DATA:
                     // Daten senden
-                    List pakete = Utils.fragment(at_idu.sdu as byte[], MSS) // Anwendungsdaten übernehmen
-                    for (int i = 0; i < pakete.size(); i++) {
-                        sendData = new String(pakete[i])
+                    if (at_idu.sdu.bytes.size() <= MSS) {
+                        sendData = at_idu.sdu
                         handleStateChange(Event.E_SEND_DATA)
+                    } else {
+                        List segmente = Utils.fragment(at_idu.sdu as byte[], MSS)
+                        for (int i = 0; i < segmente.size(); i++) {
+                            sendData = new String(segmente[i])
+                            handleStateChange(Event.E_SEND_DATA)
+                        }
                     }
-                    dataSent = true
                     break
             }
         }
@@ -336,13 +349,14 @@ class TcpLayer {
                 case (State.S_SEND_SYN):
                     // Verbindungsaufbau beginnen
                     sendAckNum = 0
-                    sendSeqNum = 400 //new Random().nextInt(6000) + 1
+                    sendSeqNum = new Random().nextInt(6000) + 1
 
                     sendAckFlag = false
                     sendSynFlag = true
                     sendFinFlag = false
                     sendRstFlag = false
                     sendWindSize = WINDOWSIZE
+                    window = WINDOWSIZE
                     sendData = ""
 
                     // T-PDU erzeugen und senden
@@ -380,10 +394,11 @@ class TcpLayer {
                     sendSynFlag = true
                     sendAckFlag = true
                     sendAckNum = recvSeqNum + 1
-                    sendSeqNum = 100 //new Random().nextInt(6000) + 1
+                    sendSeqNum = new Random().nextInt(6000) + 1
                     sendFinFlag = false
                     sendRstFlag = false
                     sendData = ""
+                    window = WINDOWSIZE
 
                     // T-PDU erzeugen und senden
                     sendTpdu()
@@ -480,9 +495,16 @@ class TcpLayer {
                         // IDU an Anwendung übergeben
                         toAppQ.put(ta_idu)
 
+                        // Empfangspuffer bearbeiten
+                        window = window + recvData.bytes.size()
+                        sendWindSize = window
+
                         recvData = ""
 
                         // ACK senden
+                        sendTpdu()
+                    } else {
+                        // Nein, Ack vom vorherigen Paket senden
                         sendTpdu()
                     }
 
@@ -499,8 +521,14 @@ class TcpLayer {
                     sendAckFlag = true
                     sendFinFlag = false
 
-                    // Daten senden
-                    sendTpdu()
+                    if (sendWindSize >= MSS) {
+                        // Daten senden
+                        sendTpdu()
+                    } else {
+                        sleep(100)
+                        // Daten senden
+                        sendTpdu()
+                    }
 
                     // Bei UTF-8 Encoding besser: sendSeqNum += sendData.bytes.size()
                     sendSeqNum += sendData.bytes.size()
@@ -514,7 +542,7 @@ class TcpLayer {
 
                 case (State.S_RCVD_ACK):
                     // ACK ohne Daten empfangen
-                    // ...
+                    sendWindSize = recvWindSize
 
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_READY)
@@ -555,7 +583,7 @@ class TcpLayer {
         ti_idu.protocol = IpLayer.PROTO_TCP
 
         // IDU in Warteschlange fuer Sendewiederholungen eintragen
-        // insertWaitQ(ti_idu)
+        insertWaitQ(ti_idu)
 
         // Daten an IP-Schicht uebergeben
         toIpQ.put(ti_idu)
