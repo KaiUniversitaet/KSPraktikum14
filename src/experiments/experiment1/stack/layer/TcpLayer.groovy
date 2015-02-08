@@ -228,12 +228,6 @@ class TcpLayer {
             //denn wir müssen diese t_pdu nicht weiterverarbeiten, wenn sie nicht an unsere Anwendung gerichtet war
 
 
-            // Entfernen von quittierten Daten aus der Warteschlange
-            // fuer Sendewiederholungen
-            //if (t_pdu.ackFlag)
-              //  removeWaitQ(recvAckNum) //wenn wir das richtige Ack empfangen haben, dann können wir das entsprechende Paket
-            // in jedem Fall aus der Warteschlange nehmen
-
             // Analysieren einer empfangenen TCP-PDU
             // Bestimmen eines Ereignises, "feuern" der FSM und Behandlung
             // den neuen Zustands
@@ -256,6 +250,17 @@ class TcpLayer {
             }
 
             //------------------------------------------------------------------
+
+
+            // Entfernen von quittierten Daten aus der Warteschlange
+            // fuer Sendewiederholungen
+            if (t_pdu.ackFlag && sendWaitQ.size()>0){
+                Utils.writeLog("TcpLayer","receive","sendWaitQ.size = ${sendWaitQ.size()}",22)
+
+                removeWaitQ(recvAckNum) //wenn wir das richtige Ack empfangen haben, dann können wir das entsprechende Paket
+                // in jedem Fall aus der Warteschlange nehmen
+            }
+
 
             int event = 0
             // Ereignis bestimmen
@@ -474,7 +479,7 @@ class TcpLayer {
                     // Daten empfangen
                     // Wurde die Sequenznummer erwartet?
                     // ACHTUNG: hier wird momentan Auslieferungsdisziplin der IP-Schicht angenommen!
-                    Utils.writeLog("TCPLayer", "handleStateChange", "${recvSeqNum + "  " + sendAckNum}", 1)
+                    Utils.writeLog("TCPLayer", "handleStateChange", "${recvSeqNum + "  " + sendAckNum}", 2)
                     if (recvSeqNum == sendAckNum) {
                         // Ja, ACK senden
                         sendSynFlag = false
@@ -583,7 +588,7 @@ class TcpLayer {
         ti_idu.protocol = IpLayer.PROTO_TCP
 
         // IDU in Warteschlange fuer Sendewiederholungen eintragen
-        //insertWaitQ(ti_idu)
+        insertWaitQ(idu: ti_idu)
 
         // Daten an IP-Schicht uebergeben
         toIpQ.put(ti_idu)
@@ -622,8 +627,9 @@ class TcpLayer {
      * @param idu
      */
     void insertWaitQ(Map idu) {
+        Utils.writeLog("TcpLayer","insertWaitQ","insert: ${[timeOut:timeOut, idu:idu]}",22)
         synchronized (sendWaitQ) {
-            sendWaitQ.add([timeOut: timeOut, idu: idu])
+            sendWaitQ.add([timeOut: timeOut, idu: idu.idu])
         }
     }
 
@@ -636,6 +642,7 @@ class TcpLayer {
      * @param seqNumber
      */
     void removeWaitQ(int seqNumber) {
+        Utils.writeLog("TcpLayer","removeWaitQ", "sendWaitQ.size= ${sendWaitQ.size()}",22)
         synchronized (sendWaitQ) {
             sendWaitQ.removeAll { m ->
                 m.idu.sdu.seqNum < seqNumber
