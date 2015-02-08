@@ -224,31 +224,31 @@ class TcpLayer {
             Utils.writeLog("TcpLayer", "receive", "uebernimmt  von IP: ${it_idu}", 2)
 
             // Hier z.B. noch auf richtigen Zielport testen
-            if (ownPort == t_pdu.dstPort) {
+            if (ownPort != t_pdu.dstPort) continue //continue springt wieder zum Anfang der while(run)-Schleife,
+            //denn wir müssen diese t_pdu nicht weiterverarbeiten, wenn sie nicht an unsere Anwendung gerichtet war
 
-                // Entfernen von quittierten Daten aus der Warteschlange
-                // fuer Sendewiederholungen
-                //if (t_pdu.ackFlag)
-                //  removeWaitQ(recvAckNum)
 
-                // Analysieren einer empfangenen TCP-PDU
-                // Bestimmen eines Ereignises, "feuern" der FSM und Behandlung
-                // den neuen Zustands
-                recvSeqNum = t_pdu.seqNum
-                recvAckNum = t_pdu.ackNum
-                recvAckFlag = t_pdu.ackFlag
-                recvFinFlag = t_pdu.finFlag
-                recvSynFlag = t_pdu.synFlag
-                recvRstFlag = t_pdu.rstFlag
-                recvWindSize = t_pdu.windSize
-                recvData = t_pdu.sdu ? t_pdu.sdu : ""
+            // Entfernen von quittierten Daten aus der Warteschlange
+            // fuer Sendewiederholungen
+            //if (t_pdu.ackFlag)
+            //    removeWaitQ(recvAckNum) //wenn wir das richtige Ack empfangen haben, dann können wir das entsprechende Paket
+            // in jedem Fall aus der Warteschlange nehmen
 
-                // Empfangspuffer bearbeiten
-                window = window - recvData.bytes.size()
+            // Analysieren einer empfangenen TCP-PDU
+            // Bestimmen eines Ereignises, "feuern" der FSM und Behandlung
+            // den neuen Zustands
+            recvSeqNum = t_pdu.seqNum
+            recvAckNum = t_pdu.ackNum
+            recvAckFlag = t_pdu.ackFlag
+            recvFinFlag = t_pdu.finFlag
+            recvSynFlag = t_pdu.synFlag
+            recvRstFlag = t_pdu.rstFlag
+            recvWindSize = t_pdu.windSize
+            recvData = t_pdu.sdu ? t_pdu.sdu : ""
 
-            } else {
-                null
-            }
+            // Empfangspuffer bearbeiten
+            window = window - recvData.bytes.size()
+
 
             if (recvSynFlag) {
                 dstIpAddr = it_idu.srcIpAddr
@@ -583,7 +583,7 @@ class TcpLayer {
         ti_idu.protocol = IpLayer.PROTO_TCP
 
         // IDU in Warteschlange fuer Sendewiederholungen eintragen
-        insertWaitQ(ti_idu)
+        //insertWaitQ(idu: ti_idu)
 
         // Daten an IP-Schicht uebergeben
         toIpQ.put(ti_idu)
