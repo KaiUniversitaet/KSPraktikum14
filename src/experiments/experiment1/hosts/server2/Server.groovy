@@ -157,8 +157,8 @@ Das Objekt ${-> name} wurde angefragt!
                     }
 
                     List pakete = Utils.fragment(reply as byte[], 120)
-                    for (int i = 0; i < pakete.size(); i++) {
-                        String replyTemp = new String(pakete[i])
+                    pakete.each { p ->
+                        String replyTemp = new String(p)
                         Utils.writeLog("Server", "server", "sendet: ${new String(apdu)}", 11)
 
                         // Antwort senden
