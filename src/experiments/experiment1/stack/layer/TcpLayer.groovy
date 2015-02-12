@@ -253,9 +253,6 @@ class TcpLayer {
             recvWindSize = t_pdu.windSize
             recvData = t_pdu.sdu ? t_pdu.sdu : ""
 
-            // Empfangspuffer verringern
-            rwin = rwin - recvData.bytes.size()
-
             if (t_pdu.ackFlag) {
                 if (t_pdu.sdu.size() > 0) {
                     removeWaitQ(recvAckNum+1)
@@ -496,6 +493,9 @@ class TcpLayer {
                     // ACHTUNG: hier wird momentan Auslieferungsdisziplin der IP-Schicht angenommen!
                     Utils.writeLog("TCPLAYERLLL", "ere", "$recvSeqNum  $sendAckNum", 11)
                     if (recvSeqNum == sendAckNum) {
+                        // Empfangspuffer verringern
+                        rwin = rwin - recvData.bytes.size()
+
                         // Ja, ACK senden
                         sendSynFlag = false
                         sendAckFlag = true
