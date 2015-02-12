@@ -297,7 +297,7 @@ class IpLayer {
     synchronized void setSortingRoutingTable(List<List> routingTable) {
         synchronized (cntrlRT) {
             routingTable.sort { a, b -> a[4].toString().toInteger() <=> b[4].toString().toInteger() }
-            this.routingTable= routingTable.clone() as List<List>
+            this.routingTable = routingTable.clone() as List<List>
         }
     }
 
