@@ -52,4 +52,7 @@ class State {
     /** RST wurde empfangen */
     static final int S_RCVD_RST = 320
 
+    /** FIN+ACK+ACK empfangen */
+    static final  int S_RCVD_ACK_ACK =330
+
 }

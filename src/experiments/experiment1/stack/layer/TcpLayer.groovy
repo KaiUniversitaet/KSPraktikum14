@@ -111,14 +111,14 @@ class TcpLayer {
     boolean sendSynFlag
     boolean sendFinFlag
     boolean sendRstFlag
-    int sendSeqNum
-    int sendAckNum
+    long sendSeqNum
+    long sendAckNum
     int sendWindSize
     String sendData
 
     // Empfangene Parameter
-    int recvSeqNum
-    int recvAckNum
+    long recvSeqNum
+    long recvAckNum
     boolean recvAckFlag
     boolean recvFinFlag
     boolean recvSynFlag
@@ -177,7 +177,8 @@ class TcpLayer {
                     // Passiver Verbindungsabbau
                     [on: Event.E_RCVD_FIN, from: State.S_READY, to: State.S_SEND_FIN_ACK],
                     [on: Event.E_SEND_FIN_ACK, from: State.S_SEND_FIN_ACK, to: State.S_WAIT_FIN_ACK_ACK],
-                    [on: Event.E_RCVD_ACK, from: State.S_WAIT_FIN_ACK_ACK, to: State.S_IDLE]
+                    [on: Event.E_RCVD_ACK, from: State.S_WAIT_FIN_ACK_ACK, to: State.S_RCVD_ACK_ACK],
+                    [on: Event.E_IDLE, from: State.S_RCVD_ACK_ACK, to: State.S_IDLE]
             ]
 
     /** Die Finite Zustandsmaschine. */
@@ -255,7 +256,7 @@ class TcpLayer {
 
             if (t_pdu.ackFlag) {
                 if (t_pdu.sdu.size() > 0) {
-                    removeWaitQ(recvAckNum+1)
+                    removeWaitQ(recvAckNum + 1)
                 } else {
                     removeWaitQ(recvAckNum)
                 }
@@ -570,16 +571,18 @@ class TcpLayer {
 
                 case (State.S_RCVD_ACK):
                     // ACK ohne Daten empfangen
-                    if (newState == State.S_IDLE) {
-                        // Warteschlange leeren
-                        clearWaitQ()
-
-                        // Ende der Verbindung signalisieren
-                        notifyClose()
-                    }
 
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_READY)
+                    break
+            //
+                case (State.S_RCVD_ACK_ACK):
+                    // Warteschlange leeren
+                    clearWaitQ()
+                    Utils.writeLog("TcpLayer", "handelstate", "CASE RCVD_ACK_ACK erreicht!", 2)
+                    // Ende der Verbindung signalisieren
+                    notifyClose()
+                    fsm.fire(Event.E_IDLE)
                     break
 
             // ----------------------------------------------------------
@@ -683,7 +686,7 @@ class TcpLayer {
      * aus der Warteschlange
      * @param seqNumber
      */
-    void removeWaitQ(int seqNumber) {
+    void removeWaitQ(long seqNumber) {
         synchronized (sendWaitQ) {
             sendWaitQ.removeAll { m ->
                 m.idu.sdu.seqNum < seqNumber

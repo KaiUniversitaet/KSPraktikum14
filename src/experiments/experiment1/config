@@ -1,7 +1,7 @@
 Version = "2.3.2"
 
 // Hier die Umgebung auswählen
-environment = "LOCAL"
+environment = "LAB"
 
 // Anzeige der Meldungen von "Utils.writeLog"
 // Meldungen mit den eingetragenen Debug-Leveln werden angezeigt
@@ -10,7 +10,7 @@ environment = "LOCAL"
 // Debugging:
 // 11: Anwendung, 33: UDP, 44: IP, 55: Link, 66: Anschluesse
 // Beispiel: [1,3,33]: Anwendung normal und UDP normal und debugging
-debugLevel = [1,2,11,4]
+debugLevel = [1,2,4]
 
 // Verzögerung in Millisekunden bei der Ausgabe von Utils.writelog (zum Mitlesen auf dem Terminal)
 debugDelay = 0
@@ -348,7 +348,7 @@ environments {
 
         server {
 
-          routerIpAddr = "141.20.33.1" // Adresse des Default Router
+          routerIpAddr = "141.20.191.1" //"141.20.33.1" // Adresse des Default Router
           ownPort = 5102
 
           // Festlegung der Netzwerkanschluesse
@@ -357,9 +357,9 @@ environments {
               virtual: false,
               lpName: "lp1",
               // deviceName: Gerätename im Betriebssystem
-              deviceName: "en4",
-              macAddr: "40:6c:8f:11:9e:38",
-              ipAddr: "141.20.33.23",
+              deviceName: "eth0",
+              macAddr: "08:00:27:eb:69:4d",
+              ipAddr: "141.20.191.93",
               recvFilter: "portrange 5000-5200 or arp"
               ]
           ]
@@ -418,7 +418,7 @@ environments {
 
     EDUROAM {
         client {
-          // serverIpAddr = "173.194.113.191" // www.google.de
+          //serverIpAddr = "173.194.113.191" // www.google.de
           serverIpAddr = "141.20.5.188" // IP-Adresse des Web-Servers des Instituts
           serverPort = 80     // Portnummer des HTTP-Dienstes
           document = "index.html"   // Durch HTTP-GET-Request zu ladenden Dokument
@@ -433,9 +433,9 @@ environments {
               virtual: false,
               lpName: "lp1",
               // deviceName: Gerätename des Betriebssystems, hier: Mac OS X, WLAN-Adapter
-              deviceName: "en0",
-              macAddr: "b8:f6:b1:18:0d:9b",
-              ipAddr: "141.20.191.150",
+              deviceName: "eth0",
+              macAddr: "08:00:27:eb:69:4d",
+              ipAddr: "141.20.191.93",
               // Dieser Filter fuer Jpcap ist so zu setzen, das nur die erwarteten Frames empfangen werden
               // Die Filtersyntax entspricht der des Kommandos "tcpdump"
               recvFilter: "portrange 5000-5200 or arp" // Jpcap empfängt nur Pakete, die durch diesen Ausdruck gefiltert werden

@@ -184,7 +184,7 @@ public class Stack {
 
         at_idu.command = TcpLayer.DATA
         at_idu.sdu = idu.sdu
-
+        at_idu.connId = idu.connId
         toTcpQ.put(at_idu)
     }
     //----------------------------------------------------------
@@ -200,7 +200,7 @@ public class Stack {
         Map tidu = [:]
 
             // Blockierendes Empfangen von TCP,
-            TA_IDU ta_idu = fromTcpQ.poll(Utils.sec10*20, TimeUnit.MILLISECONDS)
+            TA_IDU ta_idu = fromTcpQ.poll(Utils.sec10, TimeUnit.MILLISECONDS)
             // Timeout aufgetreten?
             if (ta_idu) {
                 // Nein

@@ -115,7 +115,7 @@ Host: www.sesam-strasse.com
         // ------------------------------------------------------------
 
         // IPv4-Adresse und Portnummer des HTTP-Dienstes
-        serverIpAddr = config.serverName
+        serverIpAddr = config.serverIpAddr
         serverPort = config.serverPort
 
         // Eigener UDP-Port
@@ -135,12 +135,12 @@ Host: www.sesam-strasse.com
         nameServerIpAddr = config.nameServerIpAddr
         nameServerPort = config.nameServerPort
 
-        stack.udpSend(dstIpAddr: nameServerIpAddr, dstPort: nameServerPort, srcPort: ownPort, sdu: serverIpAddr)
-        Utils.writeLog("Client", "client", "sendet: $serverIpAddr", 1)
+       // stack.udpSend(dstIpAddr: nameServerIpAddr, dstPort: nameServerPort, srcPort: ownPort, sdu: serverIpAddr)
+        //Utils.writeLog("Client", "client", "sendet: $serverIpAddr", 1)
 
-        String d1, d2
-        (d1, d2, serverIpAddr) = stack.udpReceive()
-        Utils.writeLog("Client", "client", "empfängt: $serverIpAddr", 1)
+       String d1, d2
+        //(d1, d2, serverIpAddr) = stack.udpReceive()
+        //Utils.writeLog("Client", "client", "empfängt: $serverIpAddr", 1)
 
         // ------------------------------------------------------------
 
