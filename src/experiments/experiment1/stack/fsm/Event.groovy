@@ -51,4 +51,10 @@ class Event {
 
     /** FIN+ACK wurde gesendet */
     static final int E_SEND_FIN_ACK = 300
+
+    /** RST empfangen */
+    static final int E_RCVD_RST = 310
+
+    /** Idle */
+    static final int E_IDLE = 320
 }

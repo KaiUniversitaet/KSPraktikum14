@@ -136,18 +136,17 @@ class IpLayer {
 
                     // Ist es eine direkte Route?
                     if (nextHopAddr == ownIpAddrs[linkPortName])
-                        // Ja
+                    // Ja
                         il_idu.nextHopAddr = i_pdu.dstIpAddr
                     else
-                        // Nein
+                    // Nein
                         il_idu.nextHopAddr = nextHopAddr
 
                     Utils.writeLog("IpLayer", "receive", "forwarding: ${li_idu}", 4)
 
                     // Daten an Link-Schicht uebergeben
                     toLinkQ.put(il_idu)
-                }
-                else {
+                } else {
                     // Nein
                     Utils.writeLog("IpLayer", "receive", "keine Route gefunden fuer: ${linkPortName}, ${i_pdu.dstIpAddr}", 4)
                 }
@@ -161,7 +160,6 @@ class IpLayer {
      * Übergibt Daten von der TCP- oder UDP-Schicht an die Link-Schicht
      */
     void send() {
-
 
         // IDU zu Link
         IL_IDU il_idu
@@ -219,10 +217,10 @@ class IpLayer {
 
                 // Ist es eine direkte Route?
                 if (nextHopAddr == ownIpAddrs[linkPortName])
-                    // Ja
+                // Ja
                     il_idu.nextHopAddr = ti_idu.dstIpAddr
                 else
-                    // Nein
+                // Nein
                     il_idu.nextHopAddr = nextHopAddr
 
                 // IP-Adresse des naechsten Geraetes auf dem Pfad zum Ziel eintragen
@@ -260,10 +258,9 @@ class IpLayer {
         if (entryx) {
             // Ja
             return [entryx[3], entryx[2]]
-        }
-        else
-            // Nein
-            return [null,null]
+        } else
+        // Nein
+            return [null, null]
     }
 
     //========================================================================================================
@@ -277,7 +274,7 @@ class IpLayer {
         List rt
 
         // Zugriff vor anderen Threads schützen
-        synchronized(cntrlRT) {
+        synchronized (cntrlRT) {
             rt = routingTable.clone() as List<List>
         }
         return rt
@@ -292,8 +289,15 @@ class IpLayer {
      */
     synchronized void setRoutingTable(List routingTable) {
         // Zugriff vor anderen Threads schützen
-        synchronized(cntrlRT) {
+        synchronized (cntrlRT) {
             this.routingTable = routingTable.clone() as List<List>
+        }
+    }
+
+    synchronized void setSortingRoutingTable(List<List> routingTable) {
+        synchronized (cntrlRT) {
+            routingTable.sort { a, b -> a[4].toString().toInteger() <=> b[4].toString().toInteger() }
+            this.routingTable= routingTable.clone() as List<List>
         }
     }
 
@@ -342,7 +346,6 @@ class IpLayer {
     }
 
     //------------------------------------------------------------------------------
-
 
     /**
      * Stoppen der Schicht

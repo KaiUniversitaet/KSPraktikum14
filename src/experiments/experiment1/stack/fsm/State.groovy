@@ -47,6 +47,9 @@ class State {
     static final int S_SEND_FIN_ACK = 300
 
     /** Auf FIN+ACK+ACK wartend */
-    static final int S_WAIT_FIN_ACK_ACK= 310
+    static final int S_WAIT_FIN_ACK_ACK = 310
+
+    /** RST wurde empfangen */
+    static final int S_RCVD_RST = 320
 
 }

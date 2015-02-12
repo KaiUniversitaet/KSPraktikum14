@@ -99,6 +99,9 @@ class TcpLayer {
     /** Portnummer des Verbindungsanfordernden */
     int dstPort = 0
 
+    /** Puffergröße des Empfängers */
+    int rwin = 0
+
     //========================================================================================================
     // TCP-Parameter                                                                                        //
     //========================================================================================================
@@ -155,6 +158,15 @@ class TcpLayer {
                     // Datenübertragung: Empfangen
                     [on: Event.E_RCVD_DATA, from: State.S_READY, to: State.S_RCVD_DATA],
                     [on: Event.E_READY, from: State.S_RCVD_DATA, to: State.S_READY],
+
+                    // Reset empfangen
+                    [on: Event.E_RCVD_RST, from: State.S_READY, to: State.S_RCVD_RST],
+                    [on: Event.E_RCVD_RST, from: State.S_RCVD_ACK, to: State.S_RCVD_RST],
+                    [on: Event.E_RCVD_RST, from: State.S_WAIT_SYN_ACK, to: State.S_RCVD_RST],
+                    [on: Event.E_RCVD_RST, from: State.S_WAIT_SYN_ACK_ACK, to: State.S_RCVD_RST],
+                    [on: Event.E_RCVD_RST, from: State.S_WAIT_FIN_ACK, to: State.S_RCVD_RST],
+                    [on: Event.E_RCVD_RST, from: State.S_WAIT_FIN_ACK_ACK, to: State.S_RCVD_RST],
+                    [on: Event.E_IDLE, from: State.S_RCVD_RST, to: State.S_IDLE],
 
                     // Aktiver Verbindungsabbau
                     [on: Event.E_DISCONN_REQ, from: State.S_READY, to: State.S_SEND_FIN],
@@ -241,8 +253,16 @@ class TcpLayer {
             recvWindSize = t_pdu.windSize
             recvData = t_pdu.sdu ? t_pdu.sdu : ""
 
+            // Empfangspuffer verringern
+            rwin = rwin - recvData.bytes.size()
+
             if (t_pdu.ackFlag) {
-                removeWaitQ(recvAckNum)
+                if (t_pdu.sdu.size() > 0) {
+                    removeWaitQ(recvAckNum+1)
+                } else {
+                    removeWaitQ(recvAckNum)
+                    Utils.writeLog("TCP", "hdasd", "${recvAckNum+1}", 1)
+                }
             }
 
             if (recvSynFlag) {
@@ -255,6 +275,7 @@ class TcpLayer {
             int event = 0
             // Ereignis bestimmen
             switch (true) {
+                case (recvRstFlag): event = Event.E_RCVD_RST; break
                 case (recvFinFlag): event = Event.E_RCVD_FIN; break
                 case (recvSynFlag && recvAckFlag): event = Event.E_RCVD_SYN_ACK; break
                 case (recvSynFlag): event = Event.E_RCVD_SYN; break
@@ -348,7 +369,8 @@ class TcpLayer {
                     sendSynFlag = true
                     sendFinFlag = false
                     sendRstFlag = false
-                    sendWindSize = WINDOWSIZE
+                    rwin = WINDOWSIZE
+                    sendWindSize = rwin
                     sendData = ""
 
                     // T-PDU erzeugen und senden
@@ -389,6 +411,8 @@ class TcpLayer {
                     sendSeqNum = new Random().nextInt(6000) + 1
                     sendFinFlag = false
                     sendRstFlag = false
+                    rwin = WINDOWSIZE
+                    sendWindSize = rwin
                     sendData = ""
 
                     // T-PDU erzeugen und senden
@@ -435,6 +459,9 @@ class TcpLayer {
 
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_FIN_ACK_ACK_SENT)
+
+                    // Warteschlange leeren
+                    clearWaitQ()
 
                     // Ende der Verbindung signalisieren
                     notifyClose()
@@ -488,6 +515,10 @@ class TcpLayer {
                         // IDU an Anwendung übergeben
                         toAppQ.put(ta_idu)
 
+                        // Empfangspuffer erhöhen
+                        rwin = rwin + recvData.bytes.size()
+                        sendWindSize = rwin
+
                         recvData = ""
 
                         // ACK senden
@@ -499,6 +530,7 @@ class TcpLayer {
                         sendFinFlag = false
                         sendRstFlag = false
                         sendData = ""
+                        sendWindSize = rwin
 
                         // ACK senden
                         sendTpdu()
@@ -519,7 +551,12 @@ class TcpLayer {
                     sendRstFlag = false
 
                     // Daten senden
-                    sendTpdu()
+                    if (recvWindSize < MSS) {
+                        sleep(2000)
+                        sendTpdu()
+                    } else {
+                        sendTpdu()
+                    }
 
                     // Bei UTF-8 Encoding besser: sendSeqNum += sendData.bytes.size()
                     sendSeqNum += sendData.bytes.size()
@@ -533,10 +570,30 @@ class TcpLayer {
 
                 case (State.S_RCVD_ACK):
                     // ACK ohne Daten empfangen
-                    // ...
+                    if (newState == State.S_IDLE) {
+                        // Warteschlange leeren
+                        clearWaitQ()
+
+                        // Ende der Verbindung signalisieren
+                        notifyClose()
+                    }
 
                     // Neuen Zustand der FSM erzeugen
                     fsm.fire(Event.E_READY)
+                    break
+
+            // ----------------------------------------------------------
+            // RST empfangen
+
+                case (State.S_RCVD_RST):
+                    // Warteschlange leeren
+                    clearWaitQ()
+
+                    // Verbindung schließen
+                    notifyClose()
+
+                    // Neuen Zustand der FSM erzeugen
+                    fsm.fire(Event.E_IDLE)
                     break
 
             // ----------------------------------------------------------
@@ -629,7 +686,7 @@ class TcpLayer {
     void removeWaitQ(int seqNumber) {
         synchronized (sendWaitQ) {
             sendWaitQ.removeAll { m ->
-                m.idu.sdu.seqNum <= seqNumber
+                m.idu.sdu.seqNum < seqNumber
             }
         }
     }
