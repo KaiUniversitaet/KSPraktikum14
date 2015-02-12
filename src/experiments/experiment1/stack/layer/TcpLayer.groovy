@@ -261,7 +261,6 @@ class TcpLayer {
                     removeWaitQ(recvAckNum+1)
                 } else {
                     removeWaitQ(recvAckNum)
-                    Utils.writeLog("TCP", "hdasd", "${recvAckNum+1}", 1)
                 }
             }
 
@@ -495,6 +494,7 @@ class TcpLayer {
                     // Daten empfangen
                     // Wurde die Sequenznummer erwartet?
                     // ACHTUNG: hier wird momentan Auslieferungsdisziplin der IP-Schicht angenommen!
+                    Utils.writeLog("TCPLAYERLLL", "ere", "$recvSeqNum  $sendAckNum", 11)
                     if (recvSeqNum == sendAckNum) {
                         // Ja, ACK senden
                         sendSynFlag = false

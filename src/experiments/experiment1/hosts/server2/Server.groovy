@@ -149,7 +149,7 @@ Das Objekt ${-> name} wurde angefragt!
 
                         case "daten":
                             // hier langen HTTP-body erzeugen um lang anhaltende Übertragung zu erreichen
-                            data = new String(Utils.generate(3048))
+                            data = new String(Utils.generate(10048))
 
                             dataLength = data.size()
                             reply = reply1 + data // dabei wird dataLength in reply1 eingetragen
@@ -159,7 +159,7 @@ Das Objekt ${-> name} wurde angefragt!
                     List pakete = Utils.fragment(reply as byte[], 120)
                     pakete.each { p ->
                         String replyTemp = new String(p)
-                        Utils.writeLog("Server", "server", "sendet: ${new String(apdu)}", 11)
+                        Utils.writeLog("Server", "server", "sendet: $replyTemp", 11)
 
                         // Antwort senden
                         stack.tcpSend([connId: connId, sdu: replyTemp])

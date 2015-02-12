@@ -162,7 +162,6 @@ Host: www.sesam-strasse.com
 
             // Empfang
             while (curBodyLength < bodyLength) {
-                Utils.writeLog("Client", "receive", "${curBodyLength + " " + bodyLength}", 11)
                 // Auf Empfang warten
                 Map tidu = stack.tcpReceive(connId: connId)
 
@@ -207,7 +206,6 @@ Host: www.sesam-strasse.com
                 // Länge des HTTP-Body's holen
                 bodyLength = (matcher[0] as List<String>)[1].toInteger()
                 state = WAIT_DNL
-                Utils.writeLog("Client", "handleData", "$bodyLength", 1)
             }
         }
 

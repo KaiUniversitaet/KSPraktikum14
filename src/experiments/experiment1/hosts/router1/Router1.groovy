@@ -1,10 +1,6 @@
 package experiments.experiment1.hosts.router1
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import common.utils.Utils
-
-import javax.rmi.CORBA.Util
-
 /**
  * Ein IPv4-Router.<br/>
  * Nur als Ausgangspunkt für eigene Implementierung zu verwenden!<br/>
